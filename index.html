@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S. CHOUKRI | PORTFOLIO</title>
-    <link rel="icon" type="image/svg+xml" href="icon-svg.svg">
+    <title>S. CHOUKRI | SYSTEM TERMINAL</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="icon-svg.svg">
     <style>
         :root {
             --aura-blue: #00e5ff;
@@ -30,7 +30,12 @@
             scroll-behavior: smooth;
         }
 
-        /* Custom Cursor */
+        /* Custom Cursor - Hidden on touch devices */
+        @media (hover: none) and (pointer: coarse) {
+            * { cursor: auto !important; }
+            .cursor-dot, .cursor-outline { display: none !important; }
+        }
+
         .cursor-dot {
             width: 8px;
             height: 8px;
@@ -165,14 +170,19 @@
             margin-bottom: 10px;
         }
 
+        .typewriter-container {
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
         .typewriter {
             font-size: 1.5rem;
             color: var(--susanoo-purple);
             text-shadow: 0 0 10px var(--susanoo-purple);
             border-right: 2px solid var(--aura-blue);
             white-space: nowrap;
-            overflow: hidden;
-            margin: 0 auto;
             padding-right: 5px;
         }
 
@@ -202,7 +212,7 @@
         /* Data Grids */
         .hud-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 30px;
         }
 
@@ -247,6 +257,7 @@
             font-size: 1.3rem;
             margin-bottom: 10px;
             font-family: 'Orbitron', sans-serif;
+            line-height: 1.4;
         }
 
         .card-date {
@@ -312,6 +323,8 @@
             padding: 20px;
             font-family: 'Share Tech Mono', monospace;
             color: #4af626;
+            overflow-x: auto; /* Allows scrolling on mobile */
+            white-space: nowrap; /* Keeps code from breaking awkwardly */
         }
 
         .terminal-line { margin-bottom: 10px; }
@@ -359,6 +372,7 @@
         .contact-link {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             padding: 15px 30px;
             background: rgba(0, 229, 255, 0.05);
             color: var(--aura-blue);
@@ -379,11 +393,78 @@
             text-shadow: 0 0 8px #fff;
         }
 
-        .cite {
-            font-size: 0.4em;
-            opacity: 0.3;
-            vertical-align: super;
-            color: #fff;
+        /* =========================================
+           RESPONSIVE MEDIA QUERIES
+           ========================================= */
+        @media (max-width: 900px) {
+            .hud-grid {
+                grid-template-columns: 1fr; /* 1 column on tablets and mobiles */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 15px 100px; /* Reduced padding */
+            }
+
+            .hud-corner {
+                width: 40px; /* Smaller HUD corners */
+                height: 40px;
+                border-width: 2px;
+            }
+            .top-left { top: 10px; left: 10px; }
+            .top-right { top: 10px; right: 10px; }
+            .bottom-left { bottom: 10px; left: 10px; }
+            .bottom-right { bottom: 10px; right: 10px; }
+
+            .hex-wrapper {
+                width: 200px;
+                height: 220px;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+                letter-spacing: 2px;
+            }
+
+            .typewriter {
+                font-size: 0.95rem; /* Fit text on screen */
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+                margin: 70px 0 30px;
+            }
+
+            .section-title::after {
+                display: none; /* Hide line if it gets too cramped */
+            }
+
+            .terminal-box {
+                font-size: 0.85rem;
+                padding: 15px;
+            }
+
+            .contact-panel {
+                padding: 30px 15px;
+            }
+
+            .contact-link {
+                width: 100%; /* Full width buttons on mobile */
+                font-size: 0.9rem;
+                padding: 12px 10px;
+            }
+            
+            /* Add some breathing room at bottom */
+            body { padding-bottom: 20px; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.8rem; }
+            .typewriter { font-size: 0.8rem; }
+            .section-title { font-size: 1.4rem; }
+            .card-header { font-size: 1.1rem; }
+            .project-specs div { font-size: 0.85rem; }
         }
     </style>
 </head>
@@ -407,7 +488,9 @@
                 <img src="IMG_7804.PNG" alt="Soufiane Choukri" class="hex-img">
             </div>
             <h1>SOUFIANE CHOUKRI</h1>
-            <div class="typewriter" id="typewriter-text"></div>
+            <div class="typewriter-container">
+                <div class="typewriter" id="typewriter-text"></div>
+            </div>
         </section>
 
         <h2 class="section-title">DONNÉES TECHNIQUES</h2>
@@ -426,55 +509,54 @@
         <div class="hud-grid">
             
             <div class="hud-card">
-                <div class="card-header">SYS.01 // Location de Voitures<span class="cite"></span></div>
-                <div class="project-desc">Plateforme logicielle de gestion de parc automobile et réservations.<span class="cite"></span></div>
+                <div class="card-header">SYS.01 // Location de Voitures</div>
+                <div class="project-desc">Plateforme logicielle de gestion de parc automobile et réservations.</div>
                 <div class="project-specs">
-                    <div>Système d'authentification sécurisé<span class="cite"></span></div>
-                    <div>Gestion complète des véhicules<span class="cite"></span></div>
-                    <div>Moteur de réservation client<span class="cite"></span></div>
-                    <div>Tableau de bord administratif pour la supervision<span class="cite"></span></div>
+                    <div>Système d'authentification sécurisé</div>
+                    <div>Gestion complète des véhicules</div>
+                    <div>Moteur de réservation client</div>
+                    <div>Tableau de bord administratif</div>
                 </div>
                 <div class="tech-tags">
-                    <span class="tech-tag">Laravel<span class="cite"></span></span>
-                    <span class="tech-tag">React.js<span class="cite"></span></span>
-                    <span class="tech-tag">MySQL<span class="cite"></span></span>
-                    <span class="tech-tag">REST API<span class="cite"></span></span>
-                    <span class="tech-tag">Bootstrap<span class="cite"></span></span>
+                    <span class="tech-tag">Laravel</span>
+                    <span class="tech-tag">React.js</span>
+                    <span class="tech-tag">MySQL</span>
+                    <span class="tech-tag">REST API</span>
+                    <span class="tech-tag">Bootstrap</span>
                 </div>
             </div>
 
             <div class="hud-card">
-                <div class="card-header">SYS.02 // Colocation Étudiante<span class="cite"></span></div>
-                <div class="project-desc">Réseau de colocation avec rôles hiérarchiques et API backend.<span class="cite"></span></div>
+                <div class="card-header">SYS.02 // Colocation Étudiante</div>
+                <div class="project-desc">Réseau de colocation avec rôles hiérarchiques et API backend.</div>
                 <div class="project-specs">
-                    <div>Authentification JWT multi-rôles (Admin, Propriétaire, Étudiant)<span class="cite"></span></div>
-                    <div>Gestion de la publication d'annonces<span class="cite"></span></div>
-                    <div>Téléversement et stockage d'images<span class="cite"></span></div>
-                    <div>Interface propriétaire et système de réservation<span class="cite"></span></div>
+                    <div>Authentification JWT multi-rôles</div>
+                    <div>Gestion de la publication d'annonces</div>
+                    <div>Téléversement et stockage d'images</div>
+                    <div>Interface propriétaire et réservation</div>
                 </div>
                 <div class="tech-tags">
-                    <span class="tech-tag">Spring Boot<span class="cite"></span></span>
-                    <span class="tech-tag">Angular<span class="cite"></span></span>
-                    <span class="tech-tag">JWT<span class="cite"></span></span>
-                    <span class="tech-tag">Tailwind<span class="cite"></span></span>
+                    <span class="tech-tag">Spring Boot</span>
+                    <span class="tech-tag">Angular</span>
+                    <span class="tech-tag">JWT</span>
+                    <span class="tech-tag">Tailwind</span>
                 </div>
             </div>
 
             <div class="hud-card">
-                <div class="card-header">SYS.03 // Gestion d'Internat<span class="cite"></span></div>
-                <div class="card-date">STAGE - ENSAM RABAT<span class="cite"></span></div>
-                <div class="project-desc">Solution académique pour l'administration d'infrastructures d'hébergement.<span class="cite"></span></div>
+                <div class="card-header">SYS.03 // Gestion d'Internat</div>
+                <div class="card-date">STAGE - ENSAM RABAT</div>
+                <div class="project-desc">Solution académique pour l'administration d'infrastructures.</div>
                 <div class="project-specs">
-                    <div>Sécurisation des sessions (JWT/Sanctum)<span class="cite"></span></div>
-                    <div>Administration des utilisateurs (Admin, Surveillant, Étudiant)<span class="cite"></span></div>
-                    <div>Suivi des affectations et des chambres<span class="cite"></span></div>
-                    <div>Cartographie des disponibilités en temps réel<span class="cite"></span></div>
+                    <div>Sécurisation des sessions (JWT/Sanctum)</div>
+                    <div>Administration des utilisateurs</div>
+                    <div>Suivi des affectations et des chambres</div>
+                    <div>Cartographie des disponibilités</div>
                 </div>
                 <div class="tech-tags">
-                    <span class="tech-tag">Laravel<span class="cite"></span></span>
-                    <span class="tech-tag">React.js<span class="cite"></span></span>
-                    <span class="tech-tag">Tailwind CSS<span class="cite"></span></span>
-                    <span class="tech-tag">VS Code<span class="cite"></span></span>
+                    <span class="tech-tag">Laravel</span>
+                    <span class="tech-tag">React.js</span>
+                    <span class="tech-tag">Tailwind CSS</span>
                 </div>
             </div>
 
@@ -484,84 +566,84 @@
         <div class="hud-grid">
             
             <div class="hud-card">
-                <div class="card-date">Mai 2024 - Août 2024<span class="cite"></span></div>
-                <div class="card-header">Help Desk Agent N1 - DXC | CDG<span class="cite"></span></div>
+                <div class="card-date">Mai 2024 - Août 2024</div>
+                <div class="card-header">Help Desk Agent N1 - DXC | CDG</div>
                 <div class="project-specs">
-                    <div>Gestion proactive du système de tickets d'assistance.<span class="cite"></span></div>
-                    <div>Diagnostic technique et résolution d'incidents de niveau 1.<span class="cite"></span></div>
-                    <div>Rédaction de documentation et mise à jour de la base de connaissances.<span class="cite"></span></div>
+                    <div>Gestion proactive du système de tickets.</div>
+                    <div>Diagnostic technique et résolution N1.</div>
+                    <div>Documentation et base de connaissances.</div>
                 </div>
             </div>
 
             <div class="hud-card">
-                <div class="card-date">Avr 2022 - Mai 2022<span class="cite"></span></div>
-                <div class="card-header">Stage Développeur - ICINET<span class="cite"></span></div>
+                <div class="card-date">Avr 2022 - Mai 2022</div>
+                <div class="card-header">Stage Développeur - ICINET</div>
                 <div class="project-specs">
-                    <div>Création d'une application desktop de gestion de bons d'achat.<span class="cite"></span></div>
-                    <div>Développement de l'interface graphique logicielle avec Java Swing.<span class="cite"></span></div>
-                    <div>Intégration et requêtes base de données via JDBC/MySQL.<span class="cite"></span></div>
+                    <div>Application desktop de gestion de bons.</div>
+                    <div>Développement d'interface Java Swing.</div>
+                    <div>Intégration BDD via JDBC/MySQL.</div>
                 </div>
                 <div class="tech-tags">
-                    <span class="tech-tag">Java SE<span class="cite"></span></span>
-                    <span class="tech-tag">Swing<span class="cite"></span></span>
-                    <span class="tech-tag">JDBC<span class="cite"></span></span>
-                    <span class="tech-tag">MySQL<span class="cite"></span></span>
+                    <span class="tech-tag">Java SE</span>
+                    <span class="tech-tag">Swing</span>
+                    <span class="tech-tag">JDBC</span>
+                    <span class="tech-tag">MySQL</span>
                 </div>
             </div>
 
             <div class="hud-card">
-                <div class="card-date">Août 2025 - Sept 2025<span class="cite"></span></div>
-                <div class="card-header">Agent SSI - Marriott HOTEL<span class="cite"></span></div>
+                <div class="card-date">Août 2025 - Sept 2025</div>
+                <div class="card-header">Agent SSI - Marriott HOTEL</div>
                 <div class="project-specs">
-                    <div>Surveillance des installations et prévention des risques d'incendie.<span class="cite"></span></div>
-                    <div>Gestion de l'évacuation du public et intervention précoce.<span class="cite"></span></div>
-                    <div>Assistance spécialisée en environnement ERP et IGH.<span class="cite"></span></div>
+                    <div>Surveillance et prévention des risques.</div>
+                    <div>Gestion de l'évacuation du public.</div>
+                    <div>Assistance en environnement ERP et IGH.</div>
                 </div>
             </div>
             
             <div class="hud-card">
-                <div class="card-date">Juin 2022 - Juin 2023<span class="cite"></span></div>
-                <div class="card-header">Agent SSI - THE VIEW HOTEL<span class="cite"></span></div>
+                <div class="card-date">Juin 2022 - Juin 2023</div>
+                <div class="card-header">Agent SSI - THE VIEW HOTEL</div>
                 <div class="project-specs">
-                    <div>Surveillance en continu et prévention des incidents thermiques.<span class="cite"></span></div>
-                    <div>Alerte des secours et gestion des protocoles d'évacuation.<span class="cite"></span></div>
-                    <div>Assistance au public dans les structures complexes (ERP/IGH).<span class="cite"></span></div>
+                    <div>Prévention des incidents thermiques.</div>
+                    <div>Alerte et protocoles d'évacuation.</div>
+                    <div>Assistance au public (ERP/IGH).</div>
                 </div>
             </div>
 
             <div class="hud-card">
-                <div class="card-date">Août 2025 - Décembre 2025<span class="cite"></span></div>
-                <div class="card-header">Formation Cybersécurité<span class="cite"></span></div>
+                <div class="card-date">Août 2025 - Décembre 2025</div>
+                <div class="card-header">Formation Cybersécurité</div>
                 <div class="project-specs">
-                    <div>Programme intensif JobinTech.<span class="cite"></span></div>
-                    <div>École Mohammadia d'ingénieurs (EMI), Rabat.<span class="cite"></span></div>
+                    <div>Programme intensif JobinTech.</div>
+                    <div>École Mohammadia d'ingénieurs (EMI).</div>
                 </div>
             </div>
 
             <div class="hud-card">
-                <div class="card-date">Février 2025 - Juin 2025<span class="cite"></span></div>
-                <div class="card-header">Bootcamp Full-Stack<span class="cite"></span></div>
+                <div class="card-date">Février 2025 - Juin 2025</div>
+                <div class="card-header">Bootcamp Full-Stack</div>
                 <div class="project-specs">
-                    <div>Spécialisation avancée en Java et Angular.<span class="cite"></span></div>
-                    <div>Orange Digital Center, Rabat.<span class="cite"></span></div>
+                    <div>Spécialisation avancée Java et Angular.</div>
+                    <div>Orange Digital Center, Rabat.</div>
                 </div>
             </div>
 
             <div class="hud-card">
-                <div class="card-date">2022 - 2023<span class="cite"></span></div>
-                <div class="card-header">Licence Ingénierie<span class="cite"></span></div>
+                <div class="card-date">2022 - 2023</div>
+                <div class="card-header">Licence Ingénierie</div>
                 <div class="project-specs">
-                    <div>Ingénierie de logiciel et systèmes d'information.<span class="cite"></span></div>
-                    <div>Écoles nationales des sciences appliquées (ENSA), Kenitra.<span class="cite"></span></div>
+                    <div>Ingénierie de logiciel et SI.</div>
+                    <div>ENSA, Kenitra.</div>
                 </div>
             </div>
             
             <div class="hud-card">
-                <div class="card-date">2020 - 2022<span class="cite"></span></div>
-                <div class="card-header">TS Développement<span class="cite"></span></div>
+                <div class="card-date">2020 - 2022</div>
+                <div class="card-header">TS Développement</div>
                 <div class="project-specs">
-                    <div>Technicien spécialisé en développement informatique.<span class="cite"></span></div>
-                    <div>ISTA NTIC, Rabat.<span class="cite"></span></div>
+                    <div>Technicien spécialisé en développement.</div>
+                    <div>ISTA NTIC, Rabat.</div>
                 </div>
             </div>
 
@@ -569,7 +651,7 @@
 
         <h2 class="section-title">PROTOCOLE DE COMMUNICATION</h2>
         <div class="contact-panel">
-            <div class="terminal-line" style="color: #4af626; font-family: 'Share Tech Mono', monospace; font-size: 1.2rem; margin-bottom: 10px;">
+            <div class="terminal-line" style="color: #4af626; font-family: 'Share Tech Mono', monospace; font-size: 1.2rem; margin-bottom: 10px; white-space: normal;">
                 > STATUT : EN ATTENTE DE TRANSMISSION...
             </div>
             <p style="color: #a0c4cc; font-family: 'Share Tech Mono', monospace; margin-bottom: 20px;">
@@ -578,10 +660,10 @@
             
             <div class="contact-links-container">
                 <a href="mailto:choukrisoufiane21@gmail.com" class="contact-link">
-                    [ MAILTO ] :: choukrisoufiane21@gmail.com<span class="cite"></span>
+                    [ MAILTO ] :: choukrisoufiane21@gmail.com
                 </a>
                 <a href="tel:+212650837345" class="contact-link">
-                    [ COMMLINK ] :: +212 6-50-83-73-45<span class="cite"></span>
+                    [ COMMLINK ] :: +212 6-50-83-73-45
                 </a>
             </div>
         </div>
@@ -591,33 +673,36 @@
     <script>
         const cursorDot = document.querySelector('.cursor-dot');
         const cursorOutline = document.querySelector('.cursor-outline');
+        
+        // Only run custom cursor logic if not on a mobile touch device
+        if (window.matchMedia("(pointer: fine)").matches) {
+            window.addEventListener('mousemove', (e) => {
+                const posX = e.clientX;
+                const posY = e.clientY;
 
-        window.addEventListener('mousemove', (e) => {
-            const posX = e.clientX;
-            const posY = e.clientY;
-
-            cursorDot.style.left = `${posX}px`;
-            cursorDot.style.top = `${posY}px`;
-            
-            cursorOutline.animate({
-                left: `${posX}px`,
-                top: `${posY}px`
-            }, { duration: 500, fill: "forwards" });
-        });
-
-        const interactables = document.querySelectorAll('.hud-card, .terminal-box, .contact-link');
-        interactables.forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                cursorOutline.style.width = '60px';
-                cursorOutline.style.height = '60px';
-                cursorOutline.style.borderColor = 'var(--susanoo-purple)';
+                cursorDot.style.left = `${posX}px`;
+                cursorDot.style.top = `${posY}px`;
+                
+                cursorOutline.animate({
+                    left: `${posX}px`,
+                    top: `${posY}px`
+                }, { duration: 500, fill: "forwards" });
             });
-            el.addEventListener('mouseleave', () => {
-                cursorOutline.style.width = '40px';
-                cursorOutline.style.height = '40px';
-                cursorOutline.style.borderColor = 'var(--aura-blue)';
+
+            const interactables = document.querySelectorAll('.hud-card, .terminal-box, .contact-link');
+            interactables.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursorOutline.style.width = '60px';
+                    cursorOutline.style.height = '60px';
+                    cursorOutline.style.borderColor = 'var(--susanoo-purple)';
+                });
+                el.addEventListener('mouseleave', () => {
+                    cursorOutline.style.width = '40px';
+                    cursorOutline.style.height = '40px';
+                    cursorOutline.style.borderColor = 'var(--aura-blue)';
+                });
             });
-        });
+        }
 
         const text = "> DÉVELOPPEUR INFORMATIQUE JUNIOR _";
         let index = 0;
@@ -627,7 +712,7 @@
             if (index < text.length) {
                 targetElement.innerHTML += text.charAt(index);
                 index++;
-                setTimeout(typeWriter, 100);
+                setTimeout(typeWriter, 100); // Speed of typing
             } else {
                 targetElement.innerHTML = "> DÉVELOPPEUR INFORMATIQUE JUNIOR <span style='animation: blink 1s infinite;'>_</span>";
             }
@@ -649,7 +734,7 @@
         let mouse = {
             x: null,
             y: null,
-            radius: 150 
+            radius: 100 // Smaller radius for mobile compatibility
         }
 
         window.addEventListener('mousemove', function(event){
@@ -657,7 +742,18 @@
             mouse.y = event.y;
         });
 
+        // Add touch support for the background interaction
+        window.addEventListener('touchmove', function(event){
+            mouse.x = event.touches[0].clientX;
+            mouse.y = event.touches[0].clientY;
+        });
+
         window.addEventListener('mouseout', function(){
+            mouse.x = undefined;
+            mouse.y = undefined;
+        });
+        
+        window.addEventListener('touchend', function(){
             mouse.x = undefined;
             mouse.y = undefined;
         });
@@ -725,6 +821,10 @@
         function init() {
             particlesArray = [];
             let numberOfParticles = (canvas.height * canvas.width) / 9000;
+            // Limit particles on mobile to save battery/performance
+            if (window.innerWidth < 768) {
+                numberOfParticles = (canvas.height * canvas.width) / 15000;
+            }
             for (let i = 0; i < numberOfParticles; i++) {
                 let size = (Math.random() * 2) + 1;
                 let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
@@ -742,7 +842,11 @@
                 for (let b = a; b < particlesArray.length; b++) {
                     let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x))
                     + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
-                    if (distance < (canvas.width/7) * (canvas.height/7)) {
+                    
+                    let connectDistance = (canvas.width/7) * (canvas.height/7);
+                    if (window.innerWidth < 768) connectDistance = (canvas.width/4) * (canvas.height/4); // Shorter connection lines on mobile
+
+                    if (distance < connectDistance) {
                         opacityValue = 1 - (distance/20000);
                         ctx.strokeStyle = 'rgba(0, 229, 255,' + opacityValue + ')';
                         ctx.lineWidth = 1;
