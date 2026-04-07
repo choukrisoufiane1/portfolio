@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S. CHOUKRI | SYSTEM TERMINAL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --aura-blue: #00e5ff;
+            --susanoo-purple: #7000ff;
+            --bg-deep: #050508;
+            --hud-line: rgba(0, 229, 255, 0.3);
+            --text-glow: 0 0 10px rgba(0, 229, 255, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none; 
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: #d4f1f4;
+            font-family: 'Share Tech Mono', monospace;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Cursor */
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--aura-blue);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            box-shadow: var(--text-glow);
+        }
+
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--aura-blue);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, border-color 0.2s;
+        }
+
+        /* Scanline Overlay */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            z-index: 9000;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        /* Canvas Background */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+        }
+
+        /* HUD Borders */
+        .hud-corner {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            border: 3px solid var(--aura-blue);
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        .top-left { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+        .top-right { top: 20px; right: 20px; border-left: none; border-bottom: none; }
+        .bottom-left { bottom: 20px; left: 20px; border-right: none; border-top: none; }
+        .bottom-right { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 20px 150px; 
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            min-height: 80vh;
+            justify-content: center;
+        }
+
+        /* Hexagonal Profile Picture */
+        .hex-wrapper {
+            position: relative;
+            width: 260px;
+            height: 280px;
+            margin-bottom: 30px;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            background: rgba(0, 229, 255, 0.1);
+            border: 2px solid var(--aura-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hex-img {
+            width: 95%;
+            height: 95%;
+            object-fit: cover;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            filter: grayscale(40%) contrast(1.2);
+            transition: filter 0.5s;
+        }
+
+        .hex-wrapper:hover .hex-img {
+            filter: grayscale(0%) contrast(1.1);
+        }
+
+        .scanner {
+            position: absolute;
+            top: -10%;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--aura-blue);
+            box-shadow: 0 0 15px var(--aura-blue), 0 0 30px var(--aura-blue);
+            animation: scan 3s ease-in-out infinite alternate;
+            z-index: 5;
+            opacity: 0.7;
+        }
+
+        @keyframes scan {
+            0% { top: -10%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 110%; opacity: 0; }
+        }
+
+        /* Typography */
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 20px var(--aura-blue);
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+        }
+
+        .typewriter {
+            font-size: 1.5rem;
+            color: var(--susanoo-purple);
+            text-shadow: 0 0 10px var(--susanoo-purple);
+            border-right: 2px solid var(--aura-blue);
+            white-space: nowrap;
+            overflow: hidden;
+            margin: 0 auto;
+            padding-right: 5px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: #fff;
+            margin: 100px 0 40px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .section-title::before {
+            content: '>>';
+            color: var(--susanoo-purple);
+            text-shadow: 0 0 10px var(--susanoo-purple);
+        }
+
+        .section-title::after {
+            content: '';
+            flex-grow: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--aura-blue), transparent);
+        }
+
+        /* Data Grids */
+        .hud-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .hud-card {
+            background: rgba(10, 10, 20, 0.7);
+            border: 1px solid var(--hud-line);
+            padding: 30px;
+            position: relative;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hud-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 20px; height: 20px;
+            border-top: 2px solid var(--aura-blue);
+            border-left: 2px solid var(--aura-blue);
+        }
+
+        .hud-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 20px; height: 20px;
+            border-bottom: 2px solid var(--susanoo-purple);
+            border-right: 2px solid var(--susanoo-purple);
+        }
+
+        .hud-card:hover {
+            background: rgba(0, 229, 255, 0.05);
+            border-color: var(--aura-blue);
+            box-shadow: inset 0 0 20px rgba(0, 229, 255, 0.1), 0 0 20px rgba(112, 0, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            color: var(--aura-blue);
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .card-date {
+            background: rgba(112, 0, 255, 0.2);
+            color: #fff;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            border-left: 2px solid var(--susanoo-purple);
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        /* Expanded Project Details */
+        .project-desc {
+            color: #a0c4cc;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .project-specs {
+            margin-bottom: 20px;
+            padding-left: 10px;
+            border-left: 1px dashed var(--susanoo-purple);
+            flex-grow: 1;
+        }
+
+        .project-specs div {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .project-specs div::before {
+            content: '>';
+            color: var(--aura-blue);
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0, 229, 255, 0.2);
+        }
+
+        .tech-tag {
+            background: rgba(0, 229, 255, 0.1);
+            color: var(--aura-blue);
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            border: 1px solid var(--aura-blue);
+            text-transform: uppercase;
+        }
+
+        /* Terminal Skills */
+        .terminal-box {
+            background: #000;
+            border: 1px solid var(--hud-line);
+            padding: 20px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #4af626;
+        }
+
+        .terminal-line { margin-bottom: 10px; }
+        .terminal-prompt { color: var(--aura-blue); }
+        .terminal-keyword { color: var(--susanoo-purple); }
+        .terminal-string { color: #fff; }
+
+        /* Contact Section */
+        .contact-panel {
+            background: rgba(10, 10, 20, 0.8);
+            border: 1px solid var(--aura-blue);
+            padding: 50px 30px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .contact-panel::before, .contact-panel::after {
+            content: '';
+            position: absolute;
+            width: 40px; height: 40px;
+        }
+
+        .contact-panel::before {
+            top: 0; left: 0;
+            border-top: 3px solid var(--susanoo-purple);
+            border-left: 3px solid var(--susanoo-purple);
+        }
+
+        .contact-panel::after {
+            bottom: 0; right: 0;
+            border-bottom: 3px solid var(--susanoo-purple);
+            border-right: 3px solid var(--susanoo-purple);
+        }
+
+        .contact-links-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 15px 30px;
+            background: rgba(0, 229, 255, 0.05);
+            color: var(--aura-blue);
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            border: 1px dashed var(--hud-line);
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+
+        .contact-link:hover {
+            background: rgba(0, 229, 255, 0.2);
+            border-color: var(--aura-blue);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+            transform: scale(1.05);
+            text-shadow: 0 0 8px #fff;
+        }
+
+        .cite {
+            font-size: 0.4em;
+            opacity: 0.3;
+            vertical-align: super;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+    <div class="scanlines"></div>
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="hud-corner top-left"></div>
+    <div class="hud-corner top-right"></div>
+    <div class="hud-corner bottom-left"></div>
+    <div class="hud-corner bottom-right"></div>
+
+    <div class="container">
+        
+        <section class="hero">
+            <div class="hex-wrapper">
+                <div class="scanner"></div>
+                <img src="IMG_7804.PNG" alt="Soufiane Choukri" class="hex-img">
+            </div>
+            <h1>SOUFIANE CHOUKRI</h1>
+            <div class="typewriter" id="typewriter-text"></div>
+        </section>
+
+        <h2 class="section-title">DONNÉES TECHNIQUES</h2>
+        <div class="terminal-box">
+            <div class="terminal-line"><span class="terminal-prompt">root@choukri:~#</span> <span class="terminal-keyword">cat</span> skills.json</div>
+            <div class="terminal-line">{</div>
+            <div class="terminal-line">&nbsp;&nbsp;<span class="terminal-keyword">"Languages"</span>: [<span class="terminal-string">"Java"</span>, <span class="terminal-string">"PHP"</span>, <span class="terminal-string">"Python"</span>],</div>
+            <div class="terminal-line">&nbsp;&nbsp;<span class="terminal-keyword">"Frameworks"</span>: [<span class="terminal-string">"Spring Boot"</span>, <span class="terminal-string">"Laravel"</span>, <span class="terminal-string">"Angular"</span>, <span class="terminal-string">"React"</span>],</div>
+            <div class="terminal-line">&nbsp;&nbsp;<span class="terminal-keyword">"Databases"</span>: [<span class="terminal-string">"MySQL"</span>, <span class="terminal-string">"SQL Server"</span>],</div>
+            <div class="terminal-line">&nbsp;&nbsp;<span class="terminal-keyword">"Methodology"</span>: <span class="terminal-string">"Agile/Scrum"</span></div>
+            <div class="terminal-line">}</div>
+            <div class="terminal-line"><span class="terminal-prompt">root@choukri:~#</span> <span class="blink">_</span></div>
+        </div>
+
+        <h2 class="section-title">ARCHIVES DES PROJETS</h2>
+        <div class="hud-grid">
+            
+            <div class="hud-card">
+                <div class="card-header">SYS.01 // Location de Voitures<span class="cite"></span></div>
+                <div class="project-desc">Plateforme logicielle de gestion de parc automobile et réservations.<span class="cite"></span></div>
+                <div class="project-specs">
+                    <div>Système d'authentification sécurisé<span class="cite"></span></div>
+                    <div>Gestion complète des véhicules<span class="cite"></span></div>
+                    <div>Moteur de réservation client<span class="cite"></span></div>
+                    <div>Tableau de bord administratif pour la supervision<span class="cite"></span></div>
+                </div>
+                <div class="tech-tags">
+                    <span class="tech-tag">Laravel<span class="cite"></span></span>
+                    <span class="tech-tag">React.js<span class="cite"></span></span>
+                    <span class="tech-tag">MySQL<span class="cite"></span></span>
+                    <span class="tech-tag">REST API<span class="cite"></span></span>
+                    <span class="tech-tag">Bootstrap<span class="cite"></span></span>
+                </div>
+            </div>
+
+            <div class="hud-card">
+                <div class="card-header">SYS.02 // Colocation Étudiante<span class="cite"></span></div>
+                <div class="project-desc">Réseau de colocation avec rôles hiérarchiques et API backend.<span class="cite"></span></div>
+                <div class="project-specs">
+                    <div>Authentification JWT multi-rôles (Admin, Propriétaire, Étudiant)<span class="cite"></span></div>
+                    <div>Gestion de la publication d'annonces<span class="cite"></span></div>
+                    <div>Téléversement et stockage d'images<span class="cite"></span></div>
+                    <div>Interface propriétaire et système de réservation<span class="cite"></span></div>
+                </div>
+                <div class="tech-tags">
+                    <span class="tech-tag">Spring Boot<span class="cite"></span></span>
+                    <span class="tech-tag">Angular<span class="cite"></span></span>
+                    <span class="tech-tag">JWT<span class="cite"></span></span>
+                    <span class="tech-tag">Tailwind<span class="cite"></span></span>
+                </div>
+            </div>
+
+            <div class="hud-card">
+                <div class="card-header">SYS.03 // Gestion d'Internat<span class="cite"></span></div>
+                <div class="card-date">STAGE - ENSAM RABAT<span class="cite"></span></div>
+                <div class="project-desc">Solution académique pour l'administration d'infrastructures d'hébergement.<span class="cite"></span></div>
+                <div class="project-specs">
+                    <div>Sécurisation des sessions (JWT/Sanctum)<span class="cite"></span></div>
+                    <div>Administration des utilisateurs (Admin, Surveillant, Étudiant)<span class="cite"></span></div>
+                    <div>Suivi des affectations et des chambres<span class="cite"></span></div>
+                    <div>Cartographie des disponibilités en temps réel<span class="cite"></span></div>
+                </div>
+                <div class="tech-tags">
+                    <span class="tech-tag">Laravel<span class="cite"></span></span>
+                    <span class="tech-tag">React.js<span class="cite"></span></span>
+                    <span class="tech-tag">Tailwind CSS<span class="cite"></span></span>
+                    <span class="tech-tag">VS Code<span class="cite"></span></span>
+                </div>
+            </div>
+
+        </div>
+
+        <h2 class="section-title">HISTORIQUE D'ACTIVATION</h2>
+        <div class="hud-grid">
+            <div class="hud-card">
+                <div class="card-date">Août 2025 - Décembre 2025</div>
+                <div class="card-header">Formation Cybersécurité</div>
+                <p>JobinTech - École Mohammadia d'ingénieurs (EMI), Rabat.</p>
+            </div>
+            <div class="hud-card">
+                <div class="card-date">Février 2025 - Juin 2025</div>
+                <div class="card-header">Bootcamp Full-Stack</div>
+                <p>Java/Angular - Orange Digital Center, Rabat.</p>
+            </div>
+            <div class="hud-card">
+                <div class="card-date">Mai 2024 - Août 2024</div>
+                <div class="card-header">Help Desk Agent N1</div>
+                <p>DXC | CDG. Diagnostic et résolution d'incidents informatiques.</p>
+            </div>
+            <div class="hud-card">
+                <div class="card-date">2022 - 2023</div>
+                <div class="card-header">Licence Ingénierie</div>
+                <p>Logiciel et systèmes d'information - ENSA, Kenitra.</p>
+            </div>
+            <div class="hud-card">
+                <div class="card-date">Juin 2022 - Juin 2023</div>
+                <div class="card-header">Agent SSI</div>
+                <p>THE VIEW HOTEL. Prévention des incendies et surveillance.</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">PROTOCOLE DE COMMUNICATION</h2>
+        <div class="contact-panel">
+            <div class="terminal-line" style="color: #4af626; font-family: 'Share Tech Mono', monospace; font-size: 1.2rem; margin-bottom: 10px;">
+                > STATUT : EN ATTENTE DE TRANSMISSION...
+            </div>
+            <p style="color: #a0c4cc; font-family: 'Share Tech Mono', monospace; margin-bottom: 20px;">
+                Initialisez le contact via les canaux sécurisés ci-dessous :
+            </p>
+            
+            <div class="contact-links-container">
+                <a href="mailto:choukrisoufiane21@gmail.com" class="contact-link">
+                    [ MAILTO ] :: choukrisoufiane21@gmail.com
+                </a>
+                <a href="tel:+212650837345" class="contact-link">
+                    [ COMMLINK ] :: +212 6-50-83-73-45
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorOutline = document.querySelector('.cursor-outline');
+
+        window.addEventListener('mousemove', (e) => {
+            const posX = e.clientX;
+            const posY = e.clientY;
+
+            cursorDot.style.left = `${posX}px`;
+            cursorDot.style.top = `${posY}px`;
+            
+            cursorOutline.animate({
+                left: `${posX}px`,
+                top: `${posY}px`
+            }, { duration: 500, fill: "forwards" });
+        });
+
+        const interactables = document.querySelectorAll('.hud-card, .terminal-box, .contact-link');
+        interactables.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursorOutline.style.width = '60px';
+                cursorOutline.style.height = '60px';
+                cursorOutline.style.borderColor = 'var(--susanoo-purple)';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursorOutline.style.width = '40px';
+                cursorOutline.style.height = '40px';
+                cursorOutline.style.borderColor = 'var(--aura-blue)';
+            });
+        });
+
+        const text = "> DÉVELOPPEUR INFORMATIQUE JUNIOR _";
+        let index = 0;
+        const targetElement = document.getElementById("typewriter-text");
+
+        function typeWriter() {
+            if (index < text.length) {
+                targetElement.innerHTML += text.charAt(index);
+                index++;
+                setTimeout(typeWriter, 100);
+            } else {
+                targetElement.innerHTML = "> DÉVELOPPEUR INFORMATIQUE JUNIOR <span style='animation: blink 1s infinite;'>_</span>";
+            }
+        }
+        
+        const style = document.createElement('style');
+        style.innerHTML = `@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } } .blink { animation: blink 1s infinite; }`;
+        document.head.appendChild(style);
+
+        setTimeout(typeWriter, 1000); 
+
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let mouse = {
+            x: null,
+            y: null,
+            radius: 150 
+        }
+
+        window.addEventListener('mousemove', function(event){
+            mouse.x = event.x;
+            mouse.y = event.y;
+        });
+
+        window.addEventListener('mouseout', function(){
+            mouse.x = undefined;
+            mouse.y = undefined;
+        });
+
+        window.addEventListener('resize', function(){
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+            init();
+        });
+
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+                this.baseX = this.x;
+                this.baseY = this.y;
+                this.density = (Math.random() * 30) + 1;
+            }
+            
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+            
+            update() {
+                if (this.x > canvas.width || this.x < 0) { this.directionX = -this.directionX; }
+                if (this.y > canvas.height || this.y < 0) { this.directionY = -this.directionY; }
+
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx*dx + dy*dy);
+                let forceDirectionX = dx / distance;
+                let forceDirectionY = dy / distance;
+                let maxDistance = mouse.radius;
+                let force = (maxDistance - distance) / maxDistance;
+                let directionX = forceDirectionX * force * this.density;
+                let directionY = forceDirectionY * force * this.density;
+
+                if (distance < mouse.radius) {
+                    this.x -= directionX;
+                    this.y -= directionY;
+                } else {
+                    if (this.x !== this.baseX) {
+                        let dx = this.x - this.baseX;
+                        this.x -= dx/10;
+                    }
+                    if (this.y !== this.baseY) {
+                        let dy = this.y - this.baseY;
+                        this.y -= dy/10;
+                    }
+                }
+
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
+        }
+
+        function init() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 9000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 2) - 1;
+                let directionY = (Math.random() * 2) - 1;
+                let color = '#00e5ff';
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        function connect() {
+            let opacityValue = 1;
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x))
+                    + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                    if (distance < (canvas.width/7) * (canvas.height/7)) {
+                        opacityValue = 1 - (distance/20000);
+                        ctx.strokeStyle = 'rgba(0, 229, 255,' + opacityValue + ')';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0,0,innerWidth, innerHeight);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+            connect();
+        }
+
+        init();
+        animate();
+    </script>
+</body>
+</html>
